@@ -141,7 +141,8 @@ const getExecByGlob = (doc: vscode.TextDocument) => {
 
 const getExecByFileExtension = (doc: vscode.TextDocument) => {
     try {
-        const ext = extname(doc.uri.fsPath)
+        const filePath = doc.uri.fsPath
+        const ext = extname(filePath).toLowerCase()
         if (!ext) return undefined
 
         let extMap: Record<string, string> | undefined
@@ -158,8 +159,13 @@ const getExecByFileExtension = (doc: vscode.TextDocument) => {
 
         if (extMap && typeof extMap === 'object') {
             if (ext in extMap) return extMap[ext]
+            const lowerKey = Object.keys(extMap).find(k => k.toLowerCase() === ext)
+            if (lowerKey) return extMap[lowerKey]
+
             const extNoDot = ext.startsWith('.') ? ext.slice(1) : ext
             if (extNoDot in extMap) return extMap[extNoDot]
+            const lowerNoDotKey = Object.keys(extMap).find(k => k.toLowerCase() === extNoDot)
+            if (lowerNoDotKey) return extMap[lowerNoDotKey]
         }
     } catch {}
     return undefined

@@ -157,23 +157,9 @@
                         "pom.xml": "cd $dir && mvn clean package"
                     }
                 },
-                "code-runner.executorMap": {
+                "executorMap": {
                     "type": "object",
-                    "markdownDescription": "Code Runner compatibility property for language executors",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "code-runner.executorMapByFileExtension": {
-                    "type": "object",
-                    "markdownDescription": "Code Runner compatibility property for file extension executors",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "code-runner.executorMapByGlob": {
-                    "type": "object",
-                    "markdownDescription": "Code Runner compatibility property for glob executors",
+                    "markdownDescription": "Set the executor by language ID (Alias for execMap)",
                     "additionalProperties": {
                         "type": "string"
                     }
