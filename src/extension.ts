@@ -123,13 +123,36 @@ export const activate = () => {
     })
 }
 
+const getMergedConfigMap = (primaryKey: string, aliasKeys: string[] = []): Record<string, string> => {
+    let merged: Record<string, string> = {}
+    const namespaces = ['codeRunnerDirect', 'code-runner', 'terminalCodeRunner', 'terminal2CodeRunner']
+    const keysToTry = [primaryKey, ...aliasKeys]
+
+    for (const ns of namespaces) {
+        try {
+            const config = vscode.workspace.getConfiguration(ns)
+            for (const key of keysToTry) {
+                const val = config.get<Record<string, string>>(key)
+                if (val && typeof val === 'object') {
+                    merged = { ...val, ...merged }
+                }
+            }
+        } catch {}
+    }
+
+    return merged
+}
+
 const getExecByGlob = (doc: vscode.TextDocument) => {
     try {
-        const globMap = getExtensionSetting('executorMapByGlob') ?? {}
-        if (!globMap || typeof globMap !== 'object') return undefined
+        const globMap = getMergedConfigMap('executorMapByGlob')
         for (const pattern of Object.keys(globMap)) {
             if (vscode.languages.match({ pattern }, doc)) {
-                return globMap[pattern]
+                let cmd = globMap[pattern]
+                if (doc.uri.fsPath.toLowerCase().endsWith('.csx') && cmd?.includes('scriptcs')) {
+                    cmd = 'dotnet-script $fileName'
+                }
+                return cmd
             }
         }
     } catch {
@@ -145,50 +168,50 @@ const getExecByFileExtension = (doc: vscode.TextDocument) => {
         const ext = extname(filePath).toLowerCase()
         if (!ext) return undefined
 
-        let extMap: Record<string, string> | undefined
-        try {
-            extMap = getExtensionSetting('executorMapByFileExtension' as any)
-        } catch {}
+        const extMap = getMergedConfigMap('executorMapByFileExtension', ['execMapByFileExtension'])
 
-        if (!extMap || Object.keys(extMap).length === 0) {
-            extMap = vscode.workspace.getConfiguration('codeRunnerDirect').get<Record<string, string>>('executorMapByFileExtension') ??
-                      vscode.workspace.getConfiguration('code-runner').get<Record<string, string>>('executorMapByFileExtension') ??
-                      vscode.workspace.getConfiguration('terminalCodeRunner').get<Record<string, string>>('executorMapByFileExtension') ??
-                      vscode.workspace.getConfiguration('terminal2CodeRunner').get<Record<string, string>>('executorMapByFileExtension')
-        }
-
-        if (extMap && typeof extMap === 'object') {
-            if (ext in extMap) return extMap[ext]
+        let cmd: string | undefined
+        if (ext in extMap) {
+            cmd = extMap[ext]
+        } else {
             const lowerKey = Object.keys(extMap).find(k => k.toLowerCase() === ext)
-            if (lowerKey) return extMap[lowerKey]
-
-            const extNoDot = ext.startsWith('.') ? ext.slice(1) : ext
-            if (extNoDot in extMap) return extMap[extNoDot]
-            const lowerNoDotKey = Object.keys(extMap).find(k => k.toLowerCase() === extNoDot)
-            if (lowerNoDotKey) return extMap[lowerNoDotKey]
+            if (lowerKey) {
+                cmd = extMap[lowerKey]
+            } else {
+                const extNoDot = ext.startsWith('.') ? ext.slice(1) : ext
+                if (extNoDot in extMap) {
+                    cmd = extMap[extNoDot]
+                } else {
+                    const lowerNoDotKey = Object.keys(extMap).find(k => k.toLowerCase() === extNoDot)
+                    if (lowerNoDotKey) cmd = extMap[lowerNoDotKey]
+                }
+            }
         }
+
+        // Force dotnet-script for .csx if scriptcs is configured anywhere by legacy defaults
+        if (ext === '.csx') {
+            if (!cmd || cmd?.includes('scriptcs')) {
+                cmd = 'dotnet-script $fileName'
+            }
+        }
+
+        return cmd
     } catch {}
     return undefined
 }
 
 const getExecByLanguageId = (languageId: string) => {
     try {
-        let execMap: Record<string, string> | undefined
-        try {
-            execMap = getExtensionSetting('execMap')
-        } catch {}
+        const execMap = getMergedConfigMap('execMap', ['executorMap'])
+        let cmd = execMap[languageId]
 
-        if (!execMap || Object.keys(execMap).length === 0) {
-            execMap = vscode.workspace.getConfiguration('codeRunnerDirect').get<Record<string, string>>('execMap') ??
-                      vscode.workspace.getConfiguration('code-runner').get<Record<string, string>>('executorMap') ??
-                      vscode.workspace.getConfiguration('code-runner').get<Record<string, string>>('execMap') ??
-                      vscode.workspace.getConfiguration('terminalCodeRunner').get<Record<string, string>>('execMap') ??
-                      vscode.workspace.getConfiguration('terminal2CodeRunner').get<Record<string, string>>('execMap')
+        if (languageId === 'csharpscript') {
+            if (!cmd || cmd.includes('scriptcs')) {
+                cmd = 'dotnet-script $fileName'
+            }
         }
 
-        if (execMap && typeof execMap === 'object' && languageId in execMap) {
-            return execMap[languageId]
-        }
+        return cmd
     } catch {}
     return undefined
 }

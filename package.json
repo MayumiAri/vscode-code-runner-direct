@@ -59,6 +59,7 @@
                         "shellscript": "bash ${relativeFile}",
                         "fsharp": "fsi ${relativeFile}",
                         "csharp": "dotnet run",
+                        "csharpscript": "dotnet-script $fileName",
                         "vbscript": "cscript //Nologo ${relativeFile}",
                         "typescript": "ts-node ${relativeFile}",
                         "coffeescript": "coffee ${relativeFile}",
