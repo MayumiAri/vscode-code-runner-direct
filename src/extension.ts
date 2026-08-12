@@ -36,7 +36,17 @@ export const activate = () => {
         const { fsPath } = document.uri
         const fileDir = dirname(fsPath)
         const fileName = basename(fsPath)
+
+        const hasVariable = exec.includes('$') || exec.includes('${')
         exec = parseVariables(exec, document.uri)
+
+        if (!hasVariable) {
+            const activeWorkspace = vscode.workspace.getWorkspaceFolder(document.uri)
+            const relativeFilePath = activeWorkspace ? vscode.workspace.asRelativePath(document.uri, false) : fsPath
+            const targetFile = relativeFilePath && !relativeFilePath.startsWith('..') ? relativeFilePath : fsPath
+            const formattedFile = targetFile.includes(' ') ? `"${targetFile}"` : targetFile
+            exec = `${exec} ${formattedFile}`
+        }
 
         // Terminal selection strategy
         const executeInTerminal = getExtensionSetting('executeInTerminal')
