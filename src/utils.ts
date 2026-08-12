@@ -12,7 +12,13 @@ import vscode, { Uri } from 'vscode'
  * @see https://code.visualstudio.com/docs/editor/variables-reference
  */
 export function parseVariables(str: string, activeFile: Uri) {
-    str = str.replaceAll('$path', '${relativeFile}')
+    str = str
+        .replaceAll('$fullFileName', '${file}')
+        .replaceAll('$fileNameWithoutExt', '${fileBasenameNoExtension}')
+        .replaceAll('$fileName', '${fileBasename}')
+        .replaceAll('$dirWithoutTrailingSlash', '${fileDirname}')
+        .replaceAll('$dir', '${fileDirname}')
+        .replaceAll('$path', '${relativeFile}')
 
     const replacement: Map<string | RegExp, string | ((substring: string, ...args: any[]) => string) | undefined> = new Map([
         ['${userHome}', homedir()],

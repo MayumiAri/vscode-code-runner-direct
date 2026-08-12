@@ -1,4 +1,4 @@
-import { dirname, basename } from 'node:path'
+import { dirname, basename, extname } from 'node:path'
 import * as vscode from 'vscode'
 import { getExtensionSetting, registerExtensionCommand } from 'vscode-framework'
 import { parseVariables } from './utils'
@@ -10,8 +10,10 @@ export const activate = () => {
     const checkDisplayRunButton = (textEditor: vscode.TextEditor | undefined): void => {
         try {
             const hasExec = getHasExec(textEditor)
+            void vscode.commands.executeCommand('setContext', `code-runner-direct.runButton`, hasExec)
             void vscode.commands.executeCommand('setContext', `terminal-2-code-runner.runButton`, hasExec)
             void vscode.commands.executeCommand('setContext', `terminal-code-runner.runButton`, hasExec)
+            void vscode.commands.executeCommand('setContext', `code-runner.runButton`, hasExec)
         } catch {
             // safely ignore context errors
         }
@@ -94,11 +96,12 @@ export const activate = () => {
     }
 
     try {
-        registerExtensionCommand('terminal-2-code-runner.runFile' as any, runFileAction)
+        registerExtensionCommand('code-runner-direct.runFile' as any, runFileAction)
     } catch {}
     vscode.commands.registerCommand('runFile', runFileAction)
     vscode.commands.registerCommand('terminal-code-runner.runFile', runFileAction)
     vscode.commands.registerCommand('terminal-2-code-runner.runFile', runFileAction)
+    vscode.commands.registerCommand('code-runner-direct.runFile', runFileAction)
 
     vscode.window.onDidCloseTerminal(hiddenTerminal => {
         for (const [fsPath, terminal] of activeTerminals.entries()) {
@@ -126,6 +129,32 @@ const getExecByGlob = (doc: vscode.TextDocument) => {
     return undefined
 }
 
+const getExecByFileExtension = (doc: vscode.TextDocument) => {
+    try {
+        const ext = extname(doc.uri.fsPath)
+        if (!ext) return undefined
+
+        let extMap: Record<string, string> | undefined
+        try {
+            extMap = getExtensionSetting('executorMapByFileExtension' as any)
+        } catch {}
+
+        if (!extMap || Object.keys(extMap).length === 0) {
+            extMap = vscode.workspace.getConfiguration('codeRunnerDirect').get<Record<string, string>>('executorMapByFileExtension') ??
+                      vscode.workspace.getConfiguration('code-runner').get<Record<string, string>>('executorMapByFileExtension') ??
+                      vscode.workspace.getConfiguration('terminalCodeRunner').get<Record<string, string>>('executorMapByFileExtension') ??
+                      vscode.workspace.getConfiguration('terminal2CodeRunner').get<Record<string, string>>('executorMapByFileExtension')
+        }
+
+        if (extMap && typeof extMap === 'object') {
+            if (ext in extMap) return extMap[ext]
+            const extNoDot = ext.startsWith('.') ? ext.slice(1) : ext
+            if (extNoDot in extMap) return extMap[extNoDot]
+        }
+    } catch {}
+    return undefined
+}
+
 const getExecByLanguageId = (languageId: string) => {
     try {
         let execMap: Record<string, string> | undefined
@@ -134,7 +163,10 @@ const getExecByLanguageId = (languageId: string) => {
         } catch {}
 
         if (!execMap || Object.keys(execMap).length === 0) {
-            execMap = vscode.workspace.getConfiguration('terminalCodeRunner').get<Record<string, string>>('execMap') ??
+            execMap = vscode.workspace.getConfiguration('codeRunnerDirect').get<Record<string, string>>('execMap') ??
+                      vscode.workspace.getConfiguration('code-runner').get<Record<string, string>>('executorMap') ??
+                      vscode.workspace.getConfiguration('code-runner').get<Record<string, string>>('execMap') ??
+                      vscode.workspace.getConfiguration('terminalCodeRunner').get<Record<string, string>>('execMap') ??
                       vscode.workspace.getConfiguration('terminal2CodeRunner').get<Record<string, string>>('execMap')
         }
 
@@ -149,7 +181,7 @@ const getHasExec = (textEditor: vscode.TextEditor | undefined) => {
     if (!textEditor || textEditor.viewColumn === undefined) return false
     try {
         const defaultExec = getExtensionSetting('defaultExec')
-        return Boolean(defaultExec ?? getExecByGlob(textEditor.document) ?? getExecByLanguageId(textEditor.document.languageId))
+        return Boolean(defaultExec ?? getExecByGlob(textEditor.document) ?? getExecByFileExtension(textEditor.document) ?? getExecByLanguageId(textEditor.document.languageId))
     } catch {
         return false
     }
@@ -158,7 +190,7 @@ const getHasExec = (textEditor: vscode.TextEditor | undefined) => {
 const getExec = (textEditor: vscode.TextEditor) => {
     try {
         const defaultExec = getExtensionSetting('defaultExec')
-        return getExecByGlob(textEditor.document) ?? getExecByLanguageId(textEditor.document.languageId) ?? defaultExec
+        return getExecByGlob(textEditor.document) ?? getExecByFileExtension(textEditor.document) ?? getExecByLanguageId(textEditor.document.languageId) ?? defaultExec
     } catch {
         return undefined
     }

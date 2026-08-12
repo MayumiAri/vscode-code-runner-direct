@@ -1,6 +1,6 @@
 {
-    "name": "terminal-2-code-runner",
-    "displayName": "Terminal 2 Code Runner",
+    "name": "code-runner-direct",
+    "displayName": "Code Runner Direct",
     "description": "Run code directly in active open terminals (Enhanced fork of zardoy/vscode-terminal-code-runner)",
     "publisher": "Altias",
     "version": "1.0.0",
@@ -41,16 +41,121 @@
                     },
                     "default": {
                         "javascript": "node ${relativeFile}",
-                        "ocaml": "ocaml ${relativeFile}"
+                        "java": "cd $dir && javac $fileName && java $fileNameWithoutExt",
+                        "c": "cd $dir && gcc $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+                        "zig": "zig run ${relativeFile}",
+                        "cpp": "cd $dir && g++ $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+                        "objective-c": "cd $dir && gcc -framework Cocoa $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+                        "php": "php ${relativeFile}",
+                        "python": "python -u ${relativeFile}",
+                        "perl": "perl ${relativeFile}",
+                        "perl6": "perl6 ${relativeFile}",
+                        "ruby": "ruby ${relativeFile}",
+                        "go": "go run ${relativeFile}",
+                        "lua": "lua ${relativeFile}",
+                        "groovy": "groovy ${relativeFile}",
+                        "powershell": "powershell -ExecutionPolicy ByPass -File ${relativeFile}",
+                        "bat": "cmd /c ${relativeFile}",
+                        "shellscript": "bash ${relativeFile}",
+                        "fsharp": "fsi ${relativeFile}",
+                        "csharp": "dotnet run",
+                        "vbscript": "cscript //Nologo ${relativeFile}",
+                        "typescript": "ts-node ${relativeFile}",
+                        "coffeescript": "coffee ${relativeFile}",
+                        "scala": "scala ${relativeFile}",
+                        "swift": "swift ${relativeFile}",
+                        "julia": "julia ${relativeFile}",
+                        "crystal": "crystal ${relativeFile}",
+                        "ocaml": "ocaml ${relativeFile}",
+                        "r": "Rscript ${relativeFile}",
+                        "applescript": "osascript ${relativeFile}",
+                        "clojure": "lein exec ${relativeFile}",
+                        "haxe": "haxe --cwd $dirWithoutTrailingSlash --run $fileNameWithoutExt",
+                        "rust": "cd $dir && rustc $fileName && $dir$fileNameWithoutExt",
+                        "racket": "racket ${relativeFile}",
+                        "scheme": "csi -script ${relativeFile}",
+                        "ahk": "autohotkey ${relativeFile}",
+                        "autoit": "autoit3 ${relativeFile}",
+                        "dart": "dart ${relativeFile}",
+                        "pascal": "cd $dir && fpc $fileName && $dir$fileNameWithoutExt",
+                        "d": "cd $dir && dmd $fileName && $dir$fileNameWithoutExt",
+                        "haskell": "runghc ${relativeFile}",
+                        "nim": "nim compile --verbosity:0 --hints:off --run ${relativeFile}",
+                        "lisp": "sbcl --script ${relativeFile}",
+                        "kit": "kitc --run ${relativeFile}",
+                        "v": "v run ${relativeFile}",
+                        "sass": "sass --style expanded ${relativeFile}",
+                        "scss": "scss --style expanded ${relativeFile}",
+                        "less": "cd $dir && lessc $fileName $fileNameWithoutExt.css",
+                        "FortranFreeForm": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+                        "fortran-modern": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+                        "fortran_fixed-form": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+                        "fortran": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+                        "sml": "cd $dir && sml $fileName",
+                        "mojo": "mojo run ${relativeFile}",
+                        "erlang": "escript ${relativeFile}",
+                        "spwn": "spwn build ${relativeFile}",
+                        "pkl": "cd $dir && pkl eval -f yaml $fileName -o $fileNameWithoutExt.yaml",
+                        "gleam": "gleam run -m $fileNameWithoutExt"
+                    }
+                },
+                "executorMapByFileExtension": {
+                    "type": "object",
+                    "markdownDescription": "Set the executor by file extension",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "default": {
+                        ".cs": "cd $dir && dotnet run",
+                        ".csx": "dotnet-script $fileName",
+                        ".vb": "cd $dir && vbc /nologo $fileName && $dir$fileNameWithoutExt",
+                        ".vbs": "cscript //Nologo",
+                        ".scala": "scala",
+                        ".jl": "julia",
+                        ".cr": "crystal",
+                        ".ml": "ocaml",
+                        ".zig": "zig run",
+                        ".exs": "elixir",
+                        ".hx": "haxe --cwd $dirWithoutTrailingSlash --run $fileNameWithoutExt",
+                        ".rkt": "racket",
+                        ".scm": "csi -script",
+                        ".ahk": "autohotkey",
+                        ".au3": "autoit3",
+                        ".kt": "cd $dir && kotlinc $fileName -include-runtime -d $fileNameWithoutExt.jar && java -jar $fileNameWithoutExt.jar",
+                        ".kts": "kotlinc -script",
+                        ".dart": "dart",
+                        ".pas": "cd $dir && fpc $fileName && $dir$fileNameWithoutExt",
+                        ".pp": "cd $dir && fpc $fileName && $dir$fileNameWithoutExt",
+                        ".d": "cd $dir && dmd $fileName && $dir$fileNameWithoutExt",
+                        ".hs": "runhaskell",
+                        ".nim": "nim compile --verbosity:0 --hints:off --run",
+                        ".csproj": "dotnet run --project",
+                        ".fsproj": "dotnet run --project",
+                        ".lisp": "sbcl --script",
+                        ".kit": "kitc --run",
+                        ".v": "v run",
+                        ".vsh": "v run",
+                        ".sass": "sass --style expanded",
+                        ".cu": "cd $dir && nvcc $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+                        ".ring": "ring",
+                        ".sml": "cd $dir && sml $fileName",
+                        ".mojo": "mojo run",
+                        ".erl": "escript",
+                        ".spwn": "spwn build",
+                        ".pkl": "cd $dir && pkl eval -f yaml $fileName -o $fileNameWithoutExt.yaml",
+                        ".gleam": "gleam run -m $fileNameWithoutExt"
                     }
                 },
                 "executorMapByGlob": {
                     "type": "object",
-                    "markdownDescription": "Set the executor by [globs](https://code.visualstudio.com/api/references/vscode-api#GlobPattern), support [VSCode Variables](https://code.visualstudio.com/docs/editor/variables-reference)",
+                    "markdownDescription": "Set the executor by globs",
                     "additionalProperties": {
                         "type": "string"
                     },
-                    "default": {}
+                    "default": {
+                        "*.csx": "dotnet-script",
+                        "pom.xml": "cd $dir && mvn clean package"
+                    }
                 },
                 "defaultExec": {
                     "anyOf": [
@@ -109,7 +214,7 @@
         },
         "commands": [
             {
-                "command": "terminal-2-code-runner.runFile",
+                "command": "code-runner-direct.runFile",
                 "title": "Run File",
                 "icon": "$(play)"
             }
@@ -117,9 +222,9 @@
         "menus": {
             "editor/title": [
                 {
-                    "when": "terminal-2-code-runner.runButton || terminal-code-runner.runButton",
+                    "when": "code-runner-direct.runButton || terminal-2-code-runner.runButton || terminal-code-runner.runButton",
                     "group": "navigation@-1",
-                    "command": "terminal-2-code-runner.runFile"
+                    "command": "code-runner-direct.runFile"
                 }
             ]
         }
