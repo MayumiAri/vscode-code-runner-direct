@@ -9,7 +9,9 @@ export const activate = () => {
 
     const checkDisplayRunButton = (textEditor: vscode.TextEditor | undefined): void => {
         try {
-            void vscode.commands.executeCommand('setContext', `terminal-code-runner.runButton`, getHasExec(textEditor))
+            const hasExec = getHasExec(textEditor)
+            void vscode.commands.executeCommand('setContext', `terminal-2-code-runner.runButton`, hasExec)
+            void vscode.commands.executeCommand('setContext', `terminal-code-runner.runButton`, hasExec)
         } catch {
             // safely ignore context errors
         }
@@ -92,10 +94,11 @@ export const activate = () => {
     }
 
     try {
-        registerExtensionCommand('terminal-code-runner.runFile' as any, runFileAction)
+        registerExtensionCommand('terminal-2-code-runner.runFile' as any, runFileAction)
     } catch {}
     vscode.commands.registerCommand('runFile', runFileAction)
     vscode.commands.registerCommand('terminal-code-runner.runFile', runFileAction)
+    vscode.commands.registerCommand('terminal-2-code-runner.runFile', runFileAction)
 
     vscode.window.onDidCloseTerminal(hiddenTerminal => {
         for (const [fsPath, terminal] of activeTerminals.entries()) {
@@ -125,7 +128,16 @@ const getExecByGlob = (doc: vscode.TextDocument) => {
 
 const getExecByLanguageId = (languageId: string) => {
     try {
-        const execMap = getExtensionSetting('execMap') ?? {}
+        let execMap: Record<string, string> | undefined
+        try {
+            execMap = getExtensionSetting('execMap')
+        } catch {}
+
+        if (!execMap || Object.keys(execMap).length === 0) {
+            execMap = vscode.workspace.getConfiguration('terminalCodeRunner').get<Record<string, string>>('execMap') ??
+                      vscode.workspace.getConfiguration('terminal2CodeRunner').get<Record<string, string>>('execMap')
+        }
+
         if (execMap && typeof execMap === 'object' && languageId in execMap) {
             return execMap[languageId]
         }

@@ -1,4 +1,5 @@
-    "name": "terminal-code-runner",
+{
+    "name": "terminal-2-code-runner",
     "displayName": "Terminal 2 Code Runner",
     "description": "Run code directly in active open terminals (Enhanced fork of zardoy/vscode-terminal-code-runner)",
     "publisher": "Atlias",
@@ -99,7 +100,7 @@
         },
         "commands": [
             {
-                "command": "terminal-code-runner.runFile",
+                "command": "terminal-2-code-runner.runFile",
                 "title": "Run File",
                 "icon": "$(play)"
             }
@@ -107,9 +108,9 @@
         "menus": {
             "editor/title": [
                 {
-                    "when": "terminal-code-runner.runButton",
+                    "when": "terminal-2-code-runner.runButton || terminal-code-runner.runButton",
                     "group": "navigation@-1",
-                    "command": "terminal-code-runner.runFile"
+                    "command": "terminal-2-code-runner.runFile"
                 }
             ]
         }
