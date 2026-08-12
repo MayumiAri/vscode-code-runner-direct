@@ -1,0 +1,157 @@
+    "name": "terminal-code-runner",
+    "displayName": "Terminal 2 Code Runner",
+    "description": "Run code directly in active open terminals (Enhanced fork of zardoy/vscode-terminal-code-runner)",
+    "publisher": "Atlias",
+    "version": "1.0.0",
+    "main": "./out/extension-node.js",
+    "engines": {
+        "vscode": "^1.63.0"
+    },
+    "author": {
+        "name": "Atlias"
+    },
+    "contributors": [
+        {
+            "name": "zardoy",
+            "url": "https://github.com/zardoy"
+        }
+    ],
+    "license": "MIT",
+    "categories": [
+        "Other"
+    ],
+    "contributes": {
+        "configuration": {
+            "properties": {
+                "execMap": {
+                    "type": "object",
+                    "markdownDescription": "Set the executor by [language id](https://code.visualstudio.com/docs/languages/identifiers), support [VSCode Variables](https://code.visualstudio.com/docs/editor/variables-reference)",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "default": {
+                        "javascript": "node ${relativeFile}",
+                        "ocaml": "ocaml ${relativeFile}"
+                    }
+                },
+                "executorMapByGlob": {
+                    "type": "object",
+                    "markdownDescription": "Set the executor by [globs](https://code.visualstudio.com/api/references/vscode-api#GlobPattern), support [VSCode Variables](https://code.visualstudio.com/docs/editor/variables-reference)",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "default": {}
+                },
+                "defaultExec": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null
+                },
+                "terminalCwd": {
+                    "type": "string",
+                    "enum": [
+                        "workspace",
+                        "file"
+                    ],
+                    "default": "workspace"
+                },
+                "focusOnEditor": {
+                    "type": "boolean",
+                    "description": "Focus on editor whenever the file is run instead of terminal",
+                    "default": false
+                },
+                "clearTerminal": {
+                    "type": "boolean",
+                    "description": "Whether to clear previous output before each run.",
+                    "default": false
+                },
+                "saveFile": {
+                    "type": "string",
+                    "enum": [
+                        "disabled",
+                        "onlyActive",
+                        "all"
+                    ],
+                    "default": "onlyActive"
+                },
+                "executeInTerminal": {
+                    "type": "string",
+                    "enum": [
+                        "active",
+                        "shared",
+                        "file"
+                    ],
+                    "enumDescriptions": [
+                        "Use current active terminal, or create one if none exists",
+                        "Use shared extension terminal for different files",
+                        "Use different terminals for each file"
+                    ],
+                    "description": "Which terminal to use to run file",
+                    "default": "active"
+                }
+            }
+        },
+        "commands": [
+            {
+                "command": "terminal-code-runner.runFile",
+                "title": "Run File",
+                "icon": "$(play)"
+            }
+        ],
+        "menus": {
+            "editor/title": [
+                {
+                    "when": "terminal-code-runner.runButton",
+                    "group": "navigation@-1",
+                    "command": "terminal-code-runner.runFile"
+                }
+            ]
+        }
+    },
+    "activationEvents": [
+        "onStartupFinished"
+    ],
+    "capabilities": {
+        "untrustedWorkspaces": {
+            "supported": false,
+            "description": "Running arbitrary code available only in trusted workspaces"
+        },
+        "virtualWorkspaces": {
+            "supported": false,
+            "description": "This extension requires access to the terminal"
+        }
+    },
+    "scripts": {
+        "start": "vscode-framework start",
+        "build": "tsc && vscode-framework build",
+        "lint": "eslint src/**"
+    },
+    "devDependencies": {
+        "@types/node": "^17.0.5",
+        "@types/vscode": "^1.63.1",
+        "@zardoy/tsconfig": "^1.2.2",
+        "eslint": "^8.6.0",
+        "eslint-config-zardoy": "^0.2.4",
+        "typescript": "^4.9.5"
+    },
+    "dependencies": {
+        "@zardoy/vscode-utils": "^0.0.48",
+        "vscode-framework": "^0.0.18"
+    },
+    "prettier": {
+        "semi": false,
+        "singleQuote": true,
+        "proseWrap": "never",
+        "tabWidth": 4,
+        "trailingComma": "all",
+        "arrowParens": "avoid",
+        "printWidth": 160,
+        "endOfLine": "auto"
+    }
+}
