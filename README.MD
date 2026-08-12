@@ -1,6 +1,6 @@
-# Terminal Code Runner
+# Terminal 2 Code Runner
 
-An enhanced, lightweight version of [vscode-terminal-code-runner](https://github.com/zardoy/vscode-terminal-code-runner) (originally by [zardoy](https://github.com/zardoy)) that executes code directly in your active terminal.
+An enhanced, lightweight version of [vscode-terminal-code-runner](https://github.com/zardoy/vscode-terminal-code-runner) (originally by [zardoy](https://github.com/zardoy)), maintained by [Altias](https://github.com/MayumiAri), that executes code directly in your active terminal.
 
 ## Key Features
 

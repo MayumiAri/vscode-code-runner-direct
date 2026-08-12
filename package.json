@@ -2,14 +2,23 @@
     "name": "terminal-2-code-runner",
     "displayName": "Terminal 2 Code Runner",
     "description": "Run code directly in active open terminals (Enhanced fork of zardoy/vscode-terminal-code-runner)",
-    "publisher": "Atlias",
+    "publisher": "Altias",
     "version": "1.0.0",
     "main": "./out/extension-node.js",
     "engines": {
         "vscode": "^1.63.0"
     },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/MayumiAri/vscode-terminal-2-code-runner.git"
+    },
+    "bugs": {
+        "url": "https://github.com/MayumiAri/vscode-terminal-2-code-runner/issues"
+    },
+    "homepage": "https://github.com/MayumiAri/vscode-terminal-2-code-runner#readme",
     "author": {
-        "name": "Atlias"
+        "name": "Altias",
+        "url": "https://github.com/MayumiAri"
     },
     "contributors": [
         {
